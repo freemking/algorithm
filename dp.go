@@ -18,6 +18,8 @@ func main() {
 	zoreToOnePackage()
 	//完全背包问题
 	fullPackage()
+	//子集背包问题
+	fmt.Println(sonPackage())
 	//正则表达式
 	fmt.Println(isMatch("", ".*a*b*"))
 }
@@ -37,7 +39,6 @@ func maxUpLength() {
 }
 
 func zoreToOnePackage() {
-
 	n := 3
 	w := 4
 	wt := []int{2, 1, 3}
@@ -60,7 +61,40 @@ func zoreToOnePackage() {
 }
 
 func fullPackage() {
+	coins := []int{1, 2, 5}
+	amount := 5
+	dp := make([]int, amount+1)
+	dp[0] = 1
+	for i := 0; i < len(coins); i++ {
+		for j := 1; j <= amount; j++ {
+			if j >= coins[i] {
+				dp[j] = dp[j] + dp[j-coins[i]]
+			}
+		}
+	}
+	fmt.Println(dp[amount])
+}
 
+func sonPackage() bool {
+	nums := []int{7, 8, 9, 10}
+	var sum int
+	for i := 0; i < len(nums); i++ {
+		sum += nums[i]
+	}
+	if sum%2 != 0 {
+		return false
+	}
+	sum = sum / 2
+	dp := make([]bool, sum+1)
+	dp[0] = true
+	for i := 0; i < len(nums); i++ {
+		for j := sum; j >= 0; j-- {
+			if j >= nums[i] {
+				dp[j] = dp[j] || dp[j-nums[i]]
+			}
+		}
+	}
+	return dp[sum]
 }
 
 func isMatch(text, pattern string) bool {
