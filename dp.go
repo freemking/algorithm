@@ -20,6 +20,10 @@ func main() {
 	fullPackage()
 	//子集背包问题
 	fmt.Println(sonPackage())
+	//编辑距离
+	fmt.Println(editDistance("rad", "apple"))
+	//高楼扔鸡蛋
+	fmt.Println(eggTallBuilding(100, 2))
 	//正则表达式
 	fmt.Println(isMatch("", ".*a*b*"))
 }
@@ -97,6 +101,40 @@ func sonPackage() bool {
 	return dp[sum]
 }
 
+func editDistance(s1, s2 string) int {
+	m := len(s1)
+	n := len(s2)
+	if m == 0 {
+		return n
+	}
+	if n == 0 {
+		return m
+	}
+	if s1[0] == s2[0] {
+		return editDistance(s1[1:], s2[1:])
+	} else {
+		insert := editDistance(s1[0:], s2[1:]) + 1
+		delete := editDistance(s1[1:], s2[0:]) + 1
+		replace := editDistance(s1[1:], s2[1:]) + 1
+		return min(min(insert, delete), replace)
+	}
+}
+
+func eggTallBuilding(height, num int) int {
+	if height == 0 {
+		return 0
+	}
+	if num == 1 {
+		return height
+	}
+	res := 10000
+	for i := 1; i <= height; i++ {
+		res = min(res, max(eggTallBuilding(i-1, num-1), eggTallBuilding(height-i, num))+1)
+		return res
+	}
+	return 0
+}
+
 func isMatch(text, pattern string) bool {
 	if text == pattern {
 		return true
@@ -116,6 +154,13 @@ func isMatch(text, pattern string) bool {
 
 func max(a, b int) int {
 	if a > b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int) int {
+	if a < b {
 		return a
 	}
 	return b
