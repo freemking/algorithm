@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
 /*
@@ -23,7 +24,9 @@ func main() {
 	//编辑距离
 	fmt.Println(editDistance("rad", "apple"))
 	//高楼扔鸡蛋
-	fmt.Println(eggTallBuilding(100, 2))
+	memo := map[string]int{}
+	fmt.Println(eggTallBuildingLinear(100, 2, memo))    //线性搜索
+	fmt.Println(eggTallBuildingDichotomy(100, 2, memo)) //二分搜索
 	//正则表达式
 	fmt.Println(isMatch("", ".*a*b*"))
 }
@@ -120,19 +123,52 @@ func editDistance(s1, s2 string) int {
 	}
 }
 
-func eggTallBuilding(height, num int) int {
+func eggTallBuildingLinear(height, num int, memo map[string]int) int {
 	if height == 0 {
 		return 0
 	}
 	if num == 1 {
 		return height
 	}
-	res := 10000
-	for i := 1; i <= height; i++ {
-		res = min(res, max(eggTallBuilding(i-1, num-1), eggTallBuilding(height-i, num))+1)
-		return res
+	key := strconv.Itoa(height) + "-" + strconv.Itoa(num)
+	if val, ok := memo[key]; ok {
+		return val
 	}
-	return 0
+	res := int(^uint(0) >> 1)
+	for i := 1; i <= height; i++ {
+		res = min(res, max(eggTallBuildingLinear(i-1, num-1, memo), eggTallBuildingLinear(height-i, num, memo))+1)
+	}
+	memo[key] = res
+	return res
+}
+
+func eggTallBuildingDichotomy(height, num int, memo map[string]int) int {
+	if height == 0 {
+		return 0
+	}
+	if num == 1 {
+		return height
+	}
+	key := strconv.Itoa(height) + "-" + strconv.Itoa(num)
+	if val, ok := memo[key]; ok {
+		return val
+	}
+	res := int(^uint(0) >> 1)
+	low, high := 1, height
+	for low <= high {
+		mid := (low + high) / 2
+		broken := eggTallBuildingDichotomy(mid-1, num-1, memo)
+		no_broken := eggTallBuildingDichotomy(height-mid, num, memo)
+		if broken > no_broken {
+			high = mid - 1
+			res = min(res, broken+1)
+		} else {
+			low = mid
+			res = min(res, no_broken+1)
+		}
+	}
+	memo[key] = res
+	return res
 }
 
 func isMatch(text, pattern string) bool {
