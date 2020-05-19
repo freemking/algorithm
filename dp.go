@@ -27,6 +27,8 @@ func main() {
 	memo := map[string]int{}
 	fmt.Println(eggTallBuildingLinear(100, 2, memo))    //线性搜索
 	fmt.Println(eggTallBuildingDichotomy(100, 2, memo)) //二分搜索
+	//戳气球
+	fmt.Println(pokeBalloon())
 	//正则表达式
 	fmt.Println(isMatch("", ".*a*b*"))
 }
@@ -169,6 +171,34 @@ func eggTallBuildingDichotomy(height, num int, memo map[string]int) int {
 	}
 	memo[key] = res
 	return res
+}
+
+func pokeBalloon() int {
+	nums := []int{3, 1, 5, 8}
+	n := len(nums)
+	// 添加两侧的虚拟气球
+	points := make([]int, n+2)
+	points[0] = 1
+	points[n+1] = 1
+	copy(points[1:n+1], nums[0:])
+	// base case 已经都被初始化为 0
+	dp := make([][]int, n+2)
+	for i := 0; i < len(dp); i++ {
+		dp[i] = make([]int, n+2)
+	}
+	// 开始状态转移
+	// i 应该从下往上
+	for i := n; i >= 0; i-- {
+		// j 应该从左往右
+		for j := i + 1; j < n+2; j++ {
+			// 最后戳破的气球是哪个？
+			for k := i + 1; k < j; k++ {
+				// 择优做选择
+				dp[i][j] = max(dp[i][j], dp[i][k]+dp[k][j]+points[i]*points[j]*points[k])
+			}
+		}
+	}
+	return dp[0][n+1]
 }
 
 func isMatch(text, pattern string) bool {
