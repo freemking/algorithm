@@ -29,6 +29,10 @@ func main() {
 	fmt.Println(eggTallBuildingDichotomy(100, 2, memo)) //二分搜索
 	//戳气球
 	fmt.Println(pokeBalloon())
+	//最长公共子序列
+	fmt.Println(longestCommonSubsequence("abcde", "ace"))
+	//最长回文子串
+	fmt.Println(longestPalindromeSubseq("bbaa"))
 	//正则表达式
 	fmt.Println(isMatch("", ".*a*b*"))
 }
@@ -199,6 +203,47 @@ func pokeBalloon() int {
 		}
 	}
 	return dp[0][n+1]
+}
+
+func longestCommonSubsequence(s1, s2 string) int {
+	m, n := len(s1), len(s2)
+	dp := make([][]int, m+1)
+	for i := 0; i < m+1; i++ {
+		dp[i] = make([]int, n+1)
+	}
+	var s string
+	for i := 1; i < m+1; i++ {
+		for j := 1; j < n+1; j++ {
+			if s1[i-1] == s2[j-1] {
+				s += string(s1[i-1])
+				dp[i][j] = dp[i-1][j-1] + 1
+			} else {
+				dp[i][j] = max(dp[i][j-1], dp[i-1][j])
+			}
+		}
+	}
+	fmt.Println(s)
+	return dp[m][n]
+}
+
+func longestPalindromeSubseq(s string) int {
+	n := len(s)
+	dp := make([][]int, n)
+	for i := 0; i < n; i++ {
+		dp[i] = make([]int, n)
+	}
+	dp[n-1][n-1] = 1
+	for i := n - 1; i >= 0; i-- {
+		for j := i + 1; j < n; j++ {
+			if s[i] == s[j] {
+				dp[i][j] = dp[i+1][j-1] + 2
+			} else {
+				dp[i][j] = max(dp[i+1][j], dp[i][j-1])
+			}
+		}
+	}
+	fmt.Println(dp)
+	return dp[0][n-1]
 }
 
 func isMatch(text, pattern string) bool {
