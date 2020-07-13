@@ -33,6 +33,8 @@ func main() {
 	fmt.Println(longestCommonSubsequence("abcde", "ace"))
 	//最长回文子串
 	fmt.Println(longestPalindromeSubseq("bbaa"))
+	//子字符串匹配
+	fmt.Println(stringSub("aaaaaaab", "aaab"))
 	//正则表达式
 	fmt.Println(isMatch("", ".*a*b*"))
 }
@@ -244,6 +246,37 @@ func longestPalindromeSubseq(s string) int {
 	}
 	fmt.Println(dp)
 	return dp[0][n-1]
+}
+
+func stringSub(t, p string) int {
+	next := make([]int, len(p))
+	next[0] = -1
+	j := -1
+	for i := 0; i < len(p)-1; {
+		if j == -1 || p[i] == p[j] {
+			i++
+			j++
+			next[i] = j
+		} else {
+			j = next[j]
+		}
+	}
+	fmt.Println(next)
+	m := 0
+	n := 0
+	for m < len(t) && n < len(p) {
+		if n == -1 || t[m] == p[n] {
+			n++
+			m++
+		} else {
+			n = next[n]
+		}
+		fmt.Println(m, n)
+	}
+	if n == len(p) {
+		return m - n
+	}
+	return -1
 }
 
 func isMatch(text, pattern string) bool {
