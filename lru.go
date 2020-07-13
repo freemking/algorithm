@@ -21,61 +21,94 @@ type LRUCache struct {
 }
 
 func main() {
-	obj := Constructor(3)
+	obj := Constructor(4)
 	param_1 := obj.Get(1)
 	log.Println(param_1)
 	obj.Put(1, 11)
-	log.Println(obj)
+	for k := obj.l.head; k != nil; k = k.next {
+		log.Println(k, k.next)
+	}
 	obj.Put(2, 22)
+	for k := obj.l.head; k != nil; k = k.next {
+		log.Println(k, k.next)
+	}
 	obj.Put(3, 33)
-	log.Println(obj)
+
 	obj.Put(4, 44)
+	for k := obj.l.head; k != nil; k = k.next {
+		log.Println(k, k.next)
+	}
+	obj.Put(4, 44)
+
+	log.Println("33l:", obj.l.tail)
+	obj.Put(4, 44)
+	log.Println("44l:", obj.l.tail)
+	obj.Put(5, 55)
+	log.Println("55l:", obj.l.tail)
+	obj.Put(3, 33)
+
+	for k := obj.l.head; k != nil; k = k.next {
+		log.Println(k.key, k.val)
+	}
 	log.Println(obj)
 }
 
 func Constructor(capacity int) LRUCache {
 	var lru LRUCache
+	var ln ListNode
+	var l List
+	l.head = &ln
+	l.tail = &ln
 	lru.m = make(map[int]int)
 	lru.s = capacity
-	lru.l.size = 0
+	lru.l = &l
 	return lru
 }
 
 func (l *List) addFirst(key, val int) {
-	var ln *ListNode
+	var ln ListNode
 	ln.key = key
 	ln.val = val
 	if l.size == 0 {
-		l.head = ln
-		l.tail = ln
+		l.head = &ln
+		l.tail = &ln
 	} else {
-		head := l.head
-		ln.next = head.next
-		head.next.prev = ln
-		l.head = ln
+		ln.next = l.head
+		l.head.prev = &ln
+		l.head = &ln
 	}
 	l.size++
 }
 
 func (l *List) removeLast() int {
-	var val int
-	val = l.tail.val
+	if l.size == 0 {
+		return -1
+	}
+	tail := l.tail
+	key := tail.key
 	if l.size == 1 {
 		l.head = nil
 		l.tail = nil
 	} else {
+		l.tail.prev.next = nil
 		l.tail = l.tail.prev
 	}
 	l.size--
-	return val
+	return key
 }
 
 func (l *List) remove(key int) {
-	node := l.head
-	for ; node != nil; node = node.next {
+	for node := l.head; node != nil; node = node.next {
 		if node.key == key {
-			node.prev.next = node.next
-			node.next.prev = node.prev
+			if node.prev != nil {
+				node.prev.next = node.next
+			}
+			if node.next != nil {
+				node.next.prev = node.prev
+			}
+			node = nil
+			l.size--
+			break
 		}
 	}
 }
@@ -99,8 +132,7 @@ func (this *LRUCache) Put(key int, value int) {
 			lastKey := this.l.removeLast()
 			delete(this.m, lastKey)
 		}
-		this.m[key] = value
 	}
+	this.m[key] = value
 	this.l.addFirst(key, value)
-
 }
