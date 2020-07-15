@@ -1,8 +1,6 @@
 package main
 
-import (
-	"log"
-)
+import "log"
 
 type ListNode struct {
 	key, val   int
@@ -18,39 +16,6 @@ type LRUCache struct {
 	m map[int]int
 	l *List
 	s int
-}
-
-func main() {
-	obj := Constructor(4)
-	param_1 := obj.Get(1)
-	log.Println(param_1)
-	obj.Put(1, 11)
-	for k := obj.l.head; k != nil; k = k.next {
-		log.Println(k, k.next)
-	}
-	obj.Put(2, 22)
-	for k := obj.l.head; k != nil; k = k.next {
-		log.Println(k, k.next)
-	}
-	obj.Put(3, 33)
-
-	obj.Put(4, 44)
-	for k := obj.l.head; k != nil; k = k.next {
-		log.Println(k, k.next)
-	}
-	obj.Put(4, 44)
-
-	log.Println("33l:", obj.l.tail)
-	obj.Put(4, 44)
-	log.Println("44l:", obj.l.tail)
-	obj.Put(5, 55)
-	log.Println("55l:", obj.l.tail)
-	obj.Put(3, 33)
-
-	for k := obj.l.head; k != nil; k = k.next {
-		log.Println(k.key, k.val)
-	}
-	log.Println(obj)
 }
 
 func Constructor(capacity int) LRUCache {
@@ -93,17 +58,25 @@ func (l *List) removeLast() int {
 		l.tail.prev.next = nil
 		l.tail = l.tail.prev
 	}
+	tail = nil
 	l.size--
 	return key
 }
 
 func (l *List) remove(key int) {
+	if l.size == 0 {
+		return
+	}
 	for node := l.head; node != nil; node = node.next {
 		if node.key == key {
-			if node.prev != nil {
+			if node.prev == nil {
+				l.head = node.next
+			} else {
 				node.prev.next = node.next
 			}
-			if node.next != nil {
+			if node.next == nil {
+				l.tail = node.prev
+			} else {
 				node.next.prev = node.prev
 			}
 			node = nil
@@ -135,4 +108,30 @@ func (this *LRUCache) Put(key int, value int) {
 	}
 	this.m[key] = value
 	this.l.addFirst(key, value)
+}
+
+func main() {
+	obj := Constructor(4)
+	obj.Put(1, 11)
+	obj.Put(2, 22)
+	param_1 := obj.Get(1)
+	log.Println(param_1)
+	obj.Put(3, 33)
+	obj.Put(4, 44)
+	for k := obj.l.head; k != nil; k = k.next {
+		log.Println(k)
+	}
+	obj.Put(4, 44)
+	obj.Put(4, 44)
+	obj.Put(5, 55)
+	for k := obj.l.head; k != nil; k = k.next {
+		log.Println(k)
+	}
+	obj.Put(3, 33)
+	obj.Put(3, 33)
+	obj.Put(3, 33)
+	obj.Put(3, 33)
+	for k := obj.l.head; k != nil; k = k.next {
+		log.Println(k)
+	}
 }
